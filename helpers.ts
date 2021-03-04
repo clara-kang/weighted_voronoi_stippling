@@ -1,3 +1,4 @@
+/* tslint:disable:no-bitwise */
 export function indexToColor(index: number): {r: number, g: number, b: number} {
     const upper = (index >> 16);
     const middle = (index >> 8) - (upper << 8);

@@ -8,11 +8,12 @@ export class RejectionSampleGenerator{
     constructor(imageCanvas: HTMLCanvasElement) {
         this.width = imageCanvas.width;
         this.height = imageCanvas.height;
-        this.imageData = imageCanvas.getContext('2d').getImageData(0, 0, imageCanvas.width, imageCanvas.height).data;
+        // tslint:disable-next-line:no-non-null-assertion
+        this.imageData = imageCanvas.getContext('2d')!.getImageData(0, 0, imageCanvas.width, imageCanvas.height).data;
     }
 
     sampleImage(sampleTimes: number, chanel: number): Array<Point> {
-  
+
         let sampleAttemptNum = 0;
         const samples = Array<Point>();
         const availability = new Array<boolean>(this.width * this.height).fill(true);
@@ -39,35 +40,35 @@ export class RejectionSampleGenerator{
         availability[this.getIndex(x, y)] = false;
 
         if (x > 0) {
-            availability[this.getIndex(x-1, y)] = false;
+            availability[this.getIndex(x - 1, y)] = false;
         }
 
         if (x < this.width - 1) {
-            availability[this.getIndex(x+1, y)] = false;
+            availability[this.getIndex(x + 1, y)] = false;
         }
 
         if (y > 0) {
-            availability[this.getIndex(x, y-1)] = false;
+            availability[this.getIndex(x, y - 1)] = false;
         }
 
         if (y < this.height - 1) {
-            availability[this.getIndex(x, y+1)] = false;
+            availability[this.getIndex(x, y + 1)] = false;
         }
 
         if (x > 0 && y > 0) {
-            availability[this.getIndex(x-1, y-1)] = false;
+            availability[this.getIndex(x - 1, y - 1)] = false;
         }
 
         if (x > 0 && y < this.height - 1) {
-            availability[this.getIndex(x-1, y+1)] = false;
+            availability[this.getIndex(x - 1, y + 1)] = false;
         }
 
         if (x < this.width - 1 && y > 0) {
-            availability[this.getIndex(x+1, y-1)] = false;
+            availability[this.getIndex(x + 1, y - 1)] = false;
         }
 
         if (x < this.width - 1 && y < this.height - 1) {
-            availability[this.getIndex(x+1, y+1)] = false;
+            availability[this.getIndex(x + 1, y + 1)] = false;
         }
     }
 
@@ -75,7 +76,7 @@ export class RejectionSampleGenerator{
         return y * this.width + x;
     }
 
-    private getRandomInt(max: number) {
+    private getRandomInt(max: number): number {
         return Math.floor(Math.random() * max);
     }
 

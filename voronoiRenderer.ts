@@ -1,5 +1,7 @@
-import { indexToColor } from "./helpers";
-import { Point } from "./point";
+/* tslint:disable:no-bitwise */
+/* tslint:disable:no-non-null-assertion */
+import { indexToColor } from './helpers';
+import { Point } from './point';
 import fragmentShader from './voronoid.f.glsl';
 import vertexShader from './voronoid.v.glsl';
 
@@ -12,39 +14,43 @@ export class VoronoiRenderer {
     private gl: WebGL2RenderingContext;
     private program: WebGLProgram;
 
-    private positionBuffer;
-    private centerBuffer;
-    private colorBuffer;
-    private indexBuffer;
+    private positionBuffer: WebGLBuffer;
+    private centerBuffer: WebGLBuffer;
+    private colorBuffer: WebGLBuffer;
+    private indexBuffer: WebGLBuffer;
 
     constructor(canvas: HTMLCanvasElement) {
         this.width = canvas.width;
         this.height = canvas.height;
         this.maxRadius = Math.max(this.width, this.height);
 
-        this.gl = canvas.getContext('webgl2', {preserveDrawingBuffer: true, antialias: false});
-        this.program = this.shaderProgram(this.gl, vertexShader, fragmentShader);
-        this.gl.useProgram(this.program);
+        if (canvas.getContext('webgl2', {preserveDrawingBuffer: true, antialias: false})) {
+            this.gl = canvas.getContext('webgl2', {preserveDrawingBuffer: true, antialias: false})!;
+            this.program = this.shaderProgram(this.gl, vertexShader, fragmentShader);
+            this.gl.useProgram(this.program);
 
-        const canvasWidthLoc = this.gl.getUniformLocation(this.program, "canvasWidth");
-        const canvasHeightLoc = this.gl.getUniformLocation(this.program, "canvasHeight");
-        const maxRadiusLoc = this.gl.getUniformLocation(this.program, "maxRadius");
+            const canvasWidthLoc = this.gl.getUniformLocation(this.program, 'canvasWidth');
+            const canvasHeightLoc = this.gl.getUniformLocation(this.program, 'canvasHeight');
+            const maxRadiusLoc = this.gl.getUniformLocation(this.program, 'maxRadius');
 
-        this.gl.uniform1f(canvasWidthLoc, this.width); 
-        this.gl.uniform1f(canvasHeightLoc, this.height); 
-        this.gl.uniform1f(maxRadiusLoc, this.maxRadius);
+            this.gl.uniform1f(canvasWidthLoc, this.width);
+            this.gl.uniform1f(canvasHeightLoc, this.height);
+            this.gl.uniform1f(maxRadiusLoc, this.maxRadius);
 
-        this.positionBuffer = this.gl.createBuffer();
-        this.centerBuffer = this.gl.createBuffer();
-        this.colorBuffer = this.gl.createBuffer();
-        this.indexBuffer = this.gl.createBuffer();
+            this.positionBuffer = this.gl.createBuffer()!;
+            this.centerBuffer = this.gl.createBuffer()!;
+            this.colorBuffer = this.gl.createBuffer()!;
+            this.indexBuffer = this.gl.createBuffer()!;
 
-        this.gl.enable(this.gl.DEPTH_TEST);
+            this.gl.enable(this.gl.DEPTH_TEST);
+        } else {
+            throw new Error('Webgl not supported');
+        }
     }
 
     drawVoronoiDiagram(generators: Array<Point>): void {
         this.gl.clearColor(0.8, 0.8, 0.8, 1);
-	    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.createQuadssMesh(generators);
         this.gl.drawElements(this.gl.TRIANGLES, generators.length * 6, this.gl.UNSIGNED_SHORT, 0);
     }
@@ -58,28 +64,34 @@ export class VoronoiRenderer {
         this.gl.deleteBuffer(this.indexBuffer);
     }
 
+    private addShader(prog: WebGLProgram, type: number, source: string): void {
+        const shader = this.gl.createShader(type);
+        if (shader) {
+            this.gl.shaderSource(shader, source);
+            this.gl.compileShader(shader);
+
+            if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                throw new Error('Could not compile shader:\n\n' + this.gl.getShaderInfoLog(shader));
+            }
+
+            this.gl.attachShader(prog, shader);
+        }
+    }
     private shaderProgram(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgram {
         const prog = gl.createProgram();
-        const addshader = function(type, source) {
-            var s = gl.createShader((type == 'vertex') ?
-                gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
-            gl.shaderSource(s, source);
-            gl.compileShader(s);
+        if (prog) {
+            this.addShader(prog, this.gl.VERTEX_SHADER, vs);
+            this.addShader(prog, this.gl.FRAGMENT_SHADER, fs);
 
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-                throw "Could not compile "+type+
-                    " shader:\n\n"+gl.getShaderInfoLog(s);
+            gl.linkProgram(prog!);
+
+            if (!gl.getProgramParameter(prog!, gl.LINK_STATUS)) {
+                throw new Error('Could not link the shader program!');
             }
-            gl.attachShader(prog, s);
-        };
-        addshader('vertex', vs);
-        addshader('fragment', fs);
-        gl.linkProgram(prog);
-
-        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-            throw "Could not link the shader program!";
+            return prog;
+        } else {
+            throw new Error('cannot create program');
         }
-        return prog;
     }
 
     private attributeSetFloats(
@@ -89,14 +101,14 @@ export class VoronoiRenderer {
         attrName: string,
         componentSize: number,
         data: Float32Array
-    ) {
+    ): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
         const attr = gl.getAttribLocation(prog, attrName);
         gl.enableVertexAttribArray(attr);
         gl.vertexAttribPointer(attr, componentSize, gl.FLOAT, false, 0, 0);
     }
-    
+
 
     private createQuadssMesh(generators: Array<Point>): void {
         const ptsNum = generators.length;
@@ -118,21 +130,21 @@ export class VoronoiRenderer {
             const ptLoc = generators[quadIndex];
 
             let vIndex = 0;
-            for (let i of [-1, 1]) {
-                for (let j of [-1, 1]) {
+            for (const i of [-1, 1]) {
+                for (const j of [-1, 1]) {
                     verticesPositions[vertexOffset + vIndex * 2] = ptLoc.x + radius * i;
                     verticesPositions[vertexOffset + vIndex * 2 + 1] =  this.height - ptLoc.y - 1 + radius * j;
                     vIndex ++;
                 }
             }
 
-            for (let vIndex = 0; vIndex < quadVerticesNum; vIndex ++) {
+            for (vIndex = 0; vIndex < quadVerticesNum; vIndex ++) {
                 verticesColors[colorOffset + vIndex * 3] = color.r;
                 verticesColors[colorOffset + vIndex * 3 + 1] = color.g;
                 verticesColors[colorOffset + vIndex * 3 + 2] = color.b;
             }
 
-            for (let vIndex = 0; vIndex < quadVerticesNum; vIndex ++) {
+            for (vIndex = 0; vIndex < quadVerticesNum; vIndex ++) {
                 quadCenters[vertexOffset + vIndex * 2] = ptLoc.x;
                 quadCenters[vertexOffset + vIndex * 2 + 1] = this.height - ptLoc.y - 1;
             }
@@ -148,7 +160,7 @@ export class VoronoiRenderer {
         this.attributeSetFloats(this.gl, this.program, this.positionBuffer, 'position', 2, verticesPositions);
         this.attributeSetFloats(this.gl, this.program, this.centerBuffer, 'center', 2, quadCenters);
         this.attributeSetFloats(this.gl, this.program, this.colorBuffer, 'color', 3, verticesColors);
-        
+
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);

@@ -10,7 +10,8 @@ export class CentroidCalculator {
     constructor(imageCanvas: HTMLCanvasElement) {
         this.width = imageCanvas.width;
         this.height = imageCanvas.height;
-        this.imageData = imageCanvas.getContext('2d').getImageData(0, 0, this.width, this.height).data;
+        // tslint:disable-next-line:no-non-null-assertion
+        this.imageData = imageCanvas.getContext('2d')!.getImageData(0, 0, this.width, this.height).data;
     }
 
     calculateCentroids(
@@ -21,7 +22,8 @@ export class CentroidCalculator {
         const centerYNumerators = new Array(generatorAmount).fill(0);
         const centerXNumerators = new Array(generatorAmount).fill(0);
 
-        const gl = voronoiCanvas.getContext('webgl2', {preserveDrawingBuffer: true});
+        // tslint:disable-next-line:no-non-null-assertion
+        const gl = voronoiCanvas.getContext('webgl2', {preserveDrawingBuffer: true})!;
         const pixels = new Uint8Array(voronoiCanvas.width * voronoiCanvas.height * 4);
         gl.readPixels(0, 0, voronoiCanvas.width, voronoiCanvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels, 0);
 
@@ -35,7 +37,7 @@ export class CentroidCalculator {
                 const regionIndex = colorToIndex(pseudoColor);
                 regionIndices.add(regionIndex);
 
-                const density = this.readDensity(x, y)
+                const density = this.readDensity(x, y);
                 areas[regionIndex] += density;
                 centerYNumerators[regionIndex] += y * density;
                 centerXNumerators[regionIndex] += x * density;
@@ -47,10 +49,10 @@ export class CentroidCalculator {
         const centerXs = centerXNumerators
             .map((val, index) => val / areas[index]);
 
-        return centerXs.map((val, index) => ({x: val + 0.5, y: this.height - centerYs[index]-1.5}));
+        return centerXs.map((val, index) => ({x: val + 0.5, y: this.height - centerYs[index] - 1.5}));
     }
-    
-    private getIndex(x: number, y: number) {
+
+    private getIndex(x: number, y: number): number {
         return this.width * y + x;
     }
 

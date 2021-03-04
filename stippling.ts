@@ -8,7 +8,7 @@ export function generateStipples(
     image: HTMLImageElement,
     options: StipplingOptions
 ): Array<Point> {
-    
+
     const sampleTimes = options.sampleTimes ?? 5000;
     const chanel = options.chanel ?? 0;
     const convergeThreshold = options.convergeThreshold ?? 1;
@@ -28,8 +28,9 @@ export function generateStipples(
     voronoiCanvas.width = image.width;
     voronoiCanvas.height = image.height;
 
+    // tslint:disable-next-line:no-non-null-assertion
     imgCanvas.getContext('2d')!.drawImage(image, 0, 0);
-    
+
     const rejectionSampleGenerator = new RejectionSampleGenerator(imgCanvas);
     const voronoiRenderer = new VoronoiRenderer(voronoiCanvas);
     const centroidCalculator = new CentroidCalculator(imgCanvas);
@@ -46,8 +47,8 @@ export function generateStipples(
             Math.sqrt(Math.pow(sample.x - newSamples[index].x, 2.0) + Math.pow(sample.y - newSamples[index].y, 2.0))
         ));
 
-        const validDiffs = diffs.filter(diff=>!Number.isNaN(diff));
-        const maxDiff = validDiffs.reduce((acc, diff)=>Math.max(acc, diff), Number.NEGATIVE_INFINITY);
+        const validDiffs = diffs.filter(diff => !Number.isNaN(diff));
+        const maxDiff = validDiffs.reduce((acc, diff) => Math.max(acc, diff), Number.NEGATIVE_INFINITY);
         console.log('maxDiff: ', maxDiff);
 
         if (maxDiff < convergeThreshold) {
@@ -55,7 +56,7 @@ export function generateStipples(
             break;
         }
 
-        samples = newSamples.filter(diff=>!Number.isNaN(diff));
+        samples = newSamples.filter(diff => !Number.isNaN(diff));
     }
 
     voronoiRenderer.dispose();
