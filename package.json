@@ -1,5 +1,33 @@
 {
-    "name": "weighted-voronoid-stippling-with-webgl",
-    "version": "0.0.1",
-    "types": "index.d.ts"
+  "name": "weighted-voronoi-stippling",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clara-kang/weighted_voronoi_stippling.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/clara-kang/weighted_voronoi_stippling/issues"
+  },
+  "homepage": "https://github.com/clara-kang/weighted_voronoi_stippling#readme",
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.2.3"
+  }
 }
