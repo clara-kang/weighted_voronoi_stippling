@@ -58,6 +58,8 @@ export function generateStipples(
     }
 
     voronoiRenderer.dispose();
+    document.body.removeChild(imgCanvas);
+    document.body.removeChild(voronoiCanvas);
 
     return samples;
 }
