@@ -3,7 +3,7 @@
 <img src="https://github.com/clara-kang/weighted_voronoi_stippling/blob/master/pictures/clock.jpg" width="500">
 <img src="https://github.com/clara-kang/weighted_voronoi_stippling/blob/master/pictures/clock_stipple.PNG" width="500">
 
-A Javascript implementation of [Weighted Voronoi Stippling by Adrian Secord](https://www.cs.ubc.ca/labs/imager/tr/2002/secord2002b/secord.2002b.pdf])
+A Javascript implementation of [Weighted Voronoi Stippling by Adrian Secord](https://www.cs.ubc.ca/labs/imager/tr/2002/secord2002b/secord.2002b.pdf)
 
 The pixel values are used as density.
 First points are seeded with rejection sampling.
